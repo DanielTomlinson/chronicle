@@ -2,5 +2,10 @@
 
 require 'chronicle'
 
-generator = Chronicle::Generator.new
-generator.generate "1.0.0", "1.0.1"
+COMMAND = ARGV[0].downcase
+
+if COMMAND == "between"
+  generator = Chronicle::Generator.new
+  generator.log_between ARGV[1], ARGV[2]
+  generator.generate
+end
