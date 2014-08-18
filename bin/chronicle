@@ -7,5 +7,10 @@ COMMAND = ARGV[0].downcase
 if COMMAND == "between"
   generator = Chronicle::Generator.new
   generator.log_between ARGV[1], ARGV[2]
-  generator.generate
+  
+  if ARGV[3]
+    generator.character= ARGV[3]
+  end
+  
+  puts generator.generate
 end
