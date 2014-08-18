@@ -2,20 +2,6 @@
 
 Chronicle is a simple gem to quickly generate release notes from git commits based upon a delimiter.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'chronicle'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install chronicle
-
 ## Usage
 
     $ chronicle between start-commit-or-tag last-commit-or-tag optional-custom-delimiter
