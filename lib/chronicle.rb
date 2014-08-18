@@ -29,10 +29,12 @@ module Chronicle
     end
     
     def generate
-      puts "Generating from hashes: #{@log} | Character is: #{@char}"
-      commits = @log.map {|hash| @git.gcommit(hash).message}.compact
-      commits = commits.select {|message| message.include?(@char)}
-      puts "Commits are: #{commits}"
+      is_valid = Proc.new {|msg| msg.include?(@char)}
+      
+      commits = @log.map {|hash| @git.gcommit(hash).message}.select(&is_valid)
+      lines = commits.map {|msg| msg.split(/\r?\n/).select(&is_valid)}.flatten.join("\n- ")
+      
+      puts "#{lines}"
     end
   end
 end
