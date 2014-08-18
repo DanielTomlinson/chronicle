@@ -28,6 +28,10 @@ module Chronicle
       @log = @git.log.between first, last
     end
     
+    def log_since first
+      @log = @git.log.between first, "HEAD"
+    end
+    
     def generate
       is_valid = Proc.new {|msg| msg.include?(@char)}
       
