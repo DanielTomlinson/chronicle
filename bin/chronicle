@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'chronicle'
+
+generator = Chronicle::Generator.new
+generator.generate "1.0.0", "1.0.1"
