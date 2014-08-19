@@ -1,19 +1,48 @@
 require "chronicle/version"
 require "git"
 
-module Chronicle  
-  class Generator
-    def initialize
-      @git = Git.open(Dir.pwd)
-      @char = "<*>"
+module Chronicle
+  class Repository
+    def initialize path
+      @git = Git.open(path)
+    end
+    
+    def git
+      return @git
+    end
+    
+    def git= value
+      @git = value
     end
     
     def log
-      return @log
+      return GitLog.new(git.log, self)
     end
     
-    def log= value
-      @log = value
+    def log_between first, last
+      return GitLog.new(git.log.between(first, last), self)
+    end
+    
+    def log_since first
+      return log_between(first, "HEAD")
+    end
+  end
+  
+  class GitLog
+    def initialize log, repository
+      @log = log
+      @repository = repository
+    end
+    
+    def commit_messages
+      return @log.map {|hash| @repository.git.gcommit(hash).message }
+    end
+  end
+  
+  class Generator
+    def initialize log
+      @log = log
+      @char = "<*>"
     end
     
     def character
@@ -24,23 +53,11 @@ module Chronicle
       @char = value
     end
     
-    def log_between first, last
-      @log = @git.log.between first, last
-    end
-    
-    def log_since first
-      @log = @git.log.between first, "HEAD"
-    end
-    
-    def commit_messages
-      @log.map {|hash| @git.gcommit(hash).message }
-    end
-    
     def generate
       valid = Proc.new {|msg| msg.include?(@char)}
       split_strings = Proc.new {|str| str.split(/\r?\n/)}
       
-      commits = self.commit_messages.select(&valid)
+      commits = @log.commit_messages.select(&valid)
       lines = commits.map(&split_strings).flatten.select(&valid)
       release_notes = lines.flatten.join("\n").gsub!(@char, "-")
       

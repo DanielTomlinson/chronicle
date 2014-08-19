@@ -4,24 +4,19 @@ require 'chronicle'
 
 COMMAND = ARGV[0].downcase
 
+repository = Chronicle::Repository.new(Dir.pwd)
+character = "<*>"
+log = nil
+
 if COMMAND == "between"
-  generator = Chronicle::Generator.new
-  generator.log_between ARGV[1], ARGV[2]
-  
-  if ARGV[3]
-    generator.character= ARGV[3]
-  end
-  
-  puts generator.generate
-  
+  log = repository.log_between(ARGV[1], ARGV[2])
 elsif COMMAND == "since"
-  generator = Chronicle::Generator.new
-  generator.log_since ARGV[1]
-  
-  if ARGV[2]
-    generator.character= ARGV[2]
-  end
-  
+  log = repository.log_since(ARGV[1])
+end
+
+if log
+  generator = Chronicle::Generator.new(log)
   puts generator.generate
-  
+else
+  puts "Error, unrecognised arguments"
 end
