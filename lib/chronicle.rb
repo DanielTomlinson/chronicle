@@ -1,7 +1,7 @@
 require "chronicle/version"
 require "git"
 
-module Chronicle
+module Chronicle  
   class Generator
     def initialize
       @git = Git.open(Dir.pwd)
@@ -37,10 +37,11 @@ module Chronicle
     end
     
     def generate
-      is_valid = Proc.new {|msg| msg.include?(@char)}
+      valid = Proc.new {|msg| msg.include?(@char)}
+      split_strings = Proc.new {|str| str.split(/\r?\n/)}
       
-      commits = self.commit_messages.select(&is_valid)
-      lines = commits.map {|msg| msg.split(/\r?\n/).select(&is_valid)}
+      commits = self.commit_messages.select(&valid)
+      lines = commits.map(&split_strings).flatten.select(&valid)
       release_notes = lines.flatten.join("\n").gsub!(@char, "-")
       
       return release_notes
