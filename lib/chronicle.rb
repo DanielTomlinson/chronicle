@@ -32,14 +32,19 @@ module Chronicle
       @log = @git.log.between first, "HEAD"
     end
     
+    def commit_messages
+      @log.map {|hash| @git.gcommit(hash).message }
+    end
+    
     def generate
       is_valid = Proc.new {|msg| msg.include?(@char)}
       
-      commits = @log.map {|hash| @git.gcommit(hash).message}.select(&is_valid)
+      commits = self.commit_messages.select(&is_valid)
       lines = commits.map {|msg| msg.split(/\r?\n/).select(&is_valid)}
       release_notes = lines.flatten.join("\n").gsub!(@char, "-")
       
       return release_notes
     end
+    
   end
 end
