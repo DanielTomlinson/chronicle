@@ -42,7 +42,7 @@ module Chronicle
   class Generator
     def initialize log
       @log = log
-      @char = "<*>"
+      @char = nil
     end
     
     def character
@@ -53,15 +53,35 @@ module Chronicle
       @char = value
     end
     
+    def commits
+      return @log.commit_messages.select{|m| self.valid_commit? m}
+    end
+    
+    def commit_summaries
+      return commits.map {|str| str.split(/\r?\n/).first }
+    end
+    
+    def changes
+      if @char == nil
+        return self.commit_summaries
+      else
+        return self.commits.map{|str| str.split(/\r?\n/)}.flatten.select{|m| self.valid_commit? m}
+      end
+    end
+    
     def generate
-      valid = Proc.new {|msg| msg.include?(@char)}
-      split_strings = Proc.new {|str| str.split(/\r?\n/)}
-      
-      commits = @log.commit_messages.select(&valid)
-      lines = commits.map(&split_strings).flatten.select(&valid)
-      release_notes = lines.flatten.join("\n").gsub!(@char, "-")
+      lines = changes
+      release_notes = lines
       
       return release_notes
+    end
+    
+    def valid_commit? commit
+      if @char
+        return commit.include? @char
+      else
+        return commit.length > 0
+      end
     end
     
   end
